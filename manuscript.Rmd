@@ -1,0 +1,93 @@
+---
+title: "Conferência de inventários florestais em campo"
+subtitle:
+titlerunning: Conferência 10%
+date: "`r format(Sys.time(), '%d %b %Y %H:%M:%S %Z')`"
+author: "Eric B. Gorgens, UFVJM"
+output:
+  bookdown::word_document2: default
+  pdf_document: default
+  bookdown::html_document2: default
+  bookdown::pdf_book:
+    base_format: rticles::springer_article
+    extra_dependencies: booktabs
+abstract: "A mock computed manuscript created in RStudio using {Rmarkdown}. The {Bookdown}
+  and {Rticles} packages were used to output the text in Springer Nature's desired
+  manuscript format. \n"
+bibliography: bibliografia.bib
+biblio-style: spbasic
+authors:
+- name: José Jhones Matuda
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: conferir@ufvjm.edu.br
+- name: Tiago Dornelas Otini
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: conferir@ufvjm.edu.br
+- name: Marcio Romarco Leles de Oliveira
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: conferir@ufvjm.edu.br
+- name: Gilciano Saraiva Nogueira
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: conferir@ufvjm.edu.br
+- name: Eric Bastos Gorgens
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: eric.gorgens@ufvjm.edu.br
+csl: nature.csl
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE,
+                      echo = FALSE)
+```
+
+```{r load-libraries, include=FALSE}
+# load libraries
+library(tidyverse)
+library(ggbeeswarm)
+library(bookdown)
+```
+
+# Introdução {#intro}
+
+"Literate programming" is a style of programming that uses computational notebooks to weave together code, explanatory text, data and results into a single document, enhancing scientific communication and computational reproducibility.[@shen2014; @perkel2018a; @perkel2018] (These references were added into the document using RStudio's integration with the open-source Zotero reference manager [@perkel2020] plus the [Better BibTeX](https://retorque.re/zotero-better-bibtex/) Zotero plugin.)
+
+Several platforms for creating such documents exist.[@perkel2021] Typically, these documents interleave code and text 'blocks' to build a computational narrative. But some, including [R Markdown](https://rmarkdown.rstudio.com/), [Observable](https://www.observablehq.com), and the [Jupyter Book](https://jupyterbook.org/intro.html) extension to the Jupyter ecosystem, also allow authors to include and execute code "inline" -- that is, within the text itself.
+
+This makes it possible to create fully executable manuscripts in which the document itself computes and inserts values and figures into the text rather than requiring authors to input them manually. This is in many ways the 'killer feature' of computed manuscripts: it circumvents the possibility that the author will enter an incorrect number, or forget to update a figure or value should new data arise. Among other uses, that allows authors to automatically time-stamp their documents, or insert the current version number of the software they use into their methods. For instance, this document was built at **`r format(Sys.time(), "%d %b %Y %H:%M:%S %Z")`** and calls the following R packages: `{tidyverse}` ver. **`r packageVersion("tidyverse")`**, `{ggbeeswarm}` ver. **`r packageVersion("ggbeeswarm")`** and `{bookdown}` ver. **`r packageVersion("bookdown")`**.
+
+In this manuscript, created in RStudio using the R Markdown language, we will demonstrate a more practical example. (An Observable version is [also available](https://observablehq.com/@jperkel/example-executable-observable-notebook).)
+
+# Material e métodos {#material}
+
+
+# Resultados {#resultados}
+
+## Inline computation {#sec:1}
+
+Imagine we are analyzing data from a clinical trial. We have grouped subjects in three bins and measured the concentration of some metabolite. (These data are simulated.)
+
+```{r initial-data}
+# read in some initial data
+#df1 <- read_csv('data/example-data-1.csv')
+```
+
+```{r radius}
+# radius of a circle
+r = 10
+```
+
+Rather than analyzing those data and then copying the results into our manuscript, we can use the programming language `R` to do that in the manuscript itself. Simply enclose the code inside backticks, with the letter `r`. For instance, we could calculate the circumference and area of a circle `r r`:
+
+$$A = \pi r^2, C = 2 \pi r$$
+
+# Discussão {#discussao}
+
+You could write "A = `` `r
+pi * r^2` `` and C = `` `r
+
+# Conclusão {#conclusao}
+
+2 * pi * r` ``". Plugging in the radius *r* = **`r r`**, that evaluates to "A = **`r round(pi * r^2, 2)`** and C = **`r round(2 * pi * r, 2)`**".
+
+# References
