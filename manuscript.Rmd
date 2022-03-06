@@ -63,8 +63,6 @@ In this manuscript, created in RStudio using the R Markdown language, we will de
 
 # Resultados {#resultados}
 
-## Inline computation {#sec:1}
-
 Imagine we are analyzing data from a clinical trial. We have grouped subjects in three bins and measured the concentration of some metabolite. (These data are simulated.)
 
 ```{r initial-data}
