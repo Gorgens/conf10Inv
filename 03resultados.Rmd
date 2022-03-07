@@ -1,0 +1,87 @@
+---
+title: "03resultados.Rmd"
+---
+
+
+A sensibilidade do Teste t para comparar os diâmetros das árvores do inventário protocolado (protocolado) com as mesmas árvores da conferência em campo (conferido) apresentou alta sensibilidade, acusando significância estatística para diferenças médias no diâmetro a partir de 0,10 cm e desvio padrão de 0,1. Com o aumento do desvio padrão das diferenças, houve uma leve redução na sensibilidade do teste, passando a acusar diferença estatística para desvios médios de 0,25 cm quando o desvio padrão acima de 0,85 cm (Figura 2). Seguindo as regras atualmente vigentes para a conferência de inventário em campo, as quatro intensidades amostrais simuladas resultaram na conferência de 3 parcelas de campo. Assim, o impacto de diferentes médias e desvios padrões foi semelhante nas simulações realizadas.
+
+```{r plotTestet, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = conf_t)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 2. Teste t entre DAP das árvores do inventário protocolado e os desvios simulados no conferido.
+Figure 2. Test t between DAP of the trees in the protocoled inventory and the deviations simulated in the checked.
+
+O teste KS comparou a distribuição dos diâmetros das árvores entre o inventário protocolado e o conferido (Figura 3). O Teste KS apresentou menor sensibilidade tanto para as diferenças médias quanto para o desvio padrão das diferenças, em comparação ao Teste t. Apenas desvios médios superiores a 0.55 cm no diâmetro apresentaram significância estatística, com leve acréscimo à medida que o desvio padrão aumentou. A zona de significância fraca (5% a 10% do nível de significância) foi mais proeminente no teste KS. Assim como no teste t, as quatro intensidades amostrais resultaram na conferência de 3 parcelas de campo. Desta forma, a sensibilidade do teste t foi semelhante.
+ 
+```{r plotKs, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = conf_ks)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 3. Teste de Kolmogorov-Smirnov entre DAP das árvores do inventário protocolado e os desvios simulados no conferido.
+Figure 3. Kolmogorov-Smirnov test between DBH of the trees in the protocoled inventory and the simulated deviations in the checked.
+
+A comparação entre protocolado e conferido ao nível de parcela foi realizada pelo Teste F de Graybill. Considerando os testes t e KS, o F de Graybill foi o que apresentou menor sensibilidade. Desvios médios abaixo de 0,2 cm não foram significativos a 5% (Figura 4). Na presença de altos desvios padrões (sd > 0,5 cm), mesmo desvios médios de 1 cm não apresentaram diferenças estatísticas significativas a 5%. A zona de significância fraca (5% a 10% do nível de significância) foi bastante significativa quando comparada ao teste KS e ao Teste t.
+
+```{r plotGraybill, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = conf_graybill)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 4. Teste F de Graybill entre volume das parcelas do inventário protocolado e os obtidos dos desvios simulados no conferido.
+Figure 4. Graybill F test between the volume of the portions of the protocoled inventory and those obtained from the simulated deviations in the checked.
+
+A comparação entre protocolado e misto (dados do inventário protocolado com a substituição dos dados conferidos) indicou um aumento considerável da sensibilidade dos testes. Desvios médios menores indicaram diferenças significativas nos testes analisados (Figura 5). Notou-se também que a zona de significância fraca (5% a 10% do nível de significância) foi desprezível. Diferenças médias de 0,1, independente do desvio padrão, já resultaram em diferenças significativas.
+
+```{r invt, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = inv_t)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 5. Teste t entre os DAPs das parcelas medidas no protocolado e os desvios simulados nos DAPs das conferidas e substituídas respectivamente no protocolado.
+Figure 5. Test t between the DAPs of the parcels measured in the protocol and the simulated deviations in the DAPs of those checked and replaced respectively in the protocol.
+
+O Teste de Kolmogorov-Smirnov também apresentou menor sensibilidade se comparado ao teste t, na comparação entre o protocolado e o misto (Figura 6). Mas ainda assim mais sensível do que o teste KS na comparação protocolado e conferido. Desvios médios de 0,25 cm no diâmetro já resultaram em diferenças significativas. O aumento da intensidade amostral aumentou a sensibilidade do teste para altos valores de desvio padrão das diferenças (ex: sd > 0,75 cm para intensidade de 30).
+
+```{r invks, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = inv_ks)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 6. Teste de Kolmogorov-Smirnov entre os DAPs das parcelas medidas no protocolado e os desvios simulados nos DAPs das conferidas e substituídas respectivamente no protocolado.
+Figure 6. Kolmogorov-Smirnov test between the DAPs of the plots measured in the protocol and the simulated deviations in the DAPs of those checked and replaced respectively in the protocol.
+
+A comparação ao nível de parcela (teste F de Graybill) entre protocolado e misto apresentou uma sensibilidade muito superior quando comparado ao mesmo teste usado para analisar os dados protocolado e conferido (Figura 7). Na comparação entre protocolado e misto, o teste F de Graybill apresentou sensibilidade muito semelhante ao Teste t. A zona de significância fraca (5% a 10% do nível de significância) foi desprezível, e diferenças médias de 0,1, independente do desvio padrão, já resultaram em diferenças significativas.
+
+```{r invGraybill, echo = FALSE}
+breaks = c(0, 0.05, 0.1, 1)
+ggplot(simulado, aes(difMedia, difSd, z = inv_graybill)) + 
+  geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 7. Teste F de Graybill entre os volumes das parcelas medidas no protocolado e os gerados dos desvios simulados nas conferidas e substituídas respectivamente no protocolado.
+Figure 7. Graybill F test between the volumes of the parcels measured in the protocol and those generated from the simulated deviations in those checked and replaced respectively in the protocol.
+
+A relação entre diferenças médias, desvio padrão dos desvios e intensidade amostral apresentou forte impacto no erro amostral (Figura 8). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior quanto menor a intensidade amostral. Na intensidade de 15 parcelas, por exemplo, desvio médio de 0,5 cm já resultou num erro amostral acima do permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
+
+```{r erroInvConf, echo = FALSE}
+ggplot(simulado, aes(difMedia, difSd, z = erroInvConf)) + 
+  geom_contour_filled() + ylab('Desvio padrão da diferença (cm)') +
+  xlab('Diferença média do DAP (cm)') + facet_wrap(~ sim)
+```
+
+Figura 8. Erro do inventário estimado com a substituição das parcelas conferidas no inventário protocolado.
+Figure 8. Estimated inventory error with the replacement of parcels checked in the registered inventory.

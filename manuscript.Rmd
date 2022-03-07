@@ -5,15 +5,13 @@ titlerunning: Conferência 10%
 date: "`r format(Sys.time(), '%d %b %Y %H:%M:%S %Z')`"
 author: "Eric B. Gorgens, UFVJM"
 output:
-  bookdown::word_document2: default
-  pdf_document: default
   bookdown::html_document2: default
+  pdf_document: default
+  bookdown::word_document2: default
   bookdown::pdf_book:
     base_format: rticles::springer_article
     extra_dependencies: booktabs
-abstract: "A mock computed manuscript created in RStudio using {Rmarkdown}. The {Bookdown}
-  and {Rticles} packages were used to output the text in Springer Nature's desired
-  manuscript format. \n"
+abstract: "O objetivo deste estudo é analisar a sensibilidade de diferentes abordagens estatísticas para analisar o inventário protocolado a partir do percentual vistoriado. Foi utilizado uma base de dados simulada para representar um inventário florestal com quatro intensidade amostrais: 15, 20, 25 e 30 parcelas. Para a conferência foram escolhidas aleatoriamente 10% das parcelas, garantindo um mínimo de 3 parcelas selecionadas. Foi utilizado o teste t pareado para a comparação entre médias ao nível de árvore. Para a comparação de médias do volume em nível de parcela utilizou-se o teste F de Graybill. O teste de aderência foi realizado pelo teste Kolmogorov-Smirnov. Para identificar a partir de qual momento os testes passariam a indicar diferenças significativas entre os inventários, foi adicionado um desvio de forma crescente ao conjunto de dados conferidos. A comparação entre os inventários apontou que para o desvio com diferença média no diâmetro de 0,1 cm o teste t já apresenta resultados significativos, enquanto o Kolmogorov-Smirnov apresenta a partir de 0,6 cm para a mesma comparação. Os resultados mostraram que a conferência dos 10% das parcelas do inventário protocolado só altera o erro amostral do inventário apenas em baixas intensidades amostrais."
 bibliography: bibliografia.bib
 biblio-style: spbasic
 authors:
@@ -48,44 +46,34 @@ library(ggbeeswarm)
 library(bookdown)
 ```
 
+# ABSTRACT
+
+The purpose of this study is to analyze the sensitivity of different statistical approaches to analyze the filed inventory based on the percentage inspected. A simulated database was used to represent a forest inventory with four sampling intensities: 15, 20, 25 and 30 plots. For the conference, 10% of the parcels were randomly chosen, guaranteeing a minimum of 3 selected parcels. The paired t-test was used to compare means at the tree level. For the comparison of volume means at the parcel level, the Graybill F test was used. The adherence test was performed using the Kolmogorov-Smirnov test. To identify from which moment the tests would start to indicate significant differences between the inventories, a deviation was increasingly added to the set of verified data. In the comparison between the inventories, it was pointed out that for the deviation with a mean difference in diameter of 0.1 cm, the t test already presents significant results, while the Kolmogorov-Smirnov presents from 0.6 cm for the same comparison. The results showed that the checking of 10% of the parcels of the protocoled inventory only changes the sampling error of the inventory only at low sampling intensities.
+
 # Introdução {#intro}
 
-"Literate programming" is a style of programming that uses computational notebooks to weave together code, explanatory text, data and results into a single document, enhancing scientific communication and computational reproducibility.[@shen2014; @perkel2018a; @perkel2018] (These references were added into the document using RStudio's integration with the open-source Zotero reference manager [@perkel2020] plus the [Better BibTeX](https://retorque.re/zotero-better-bibtex/) Zotero plugin.)
+```{r get-intro, child="01introducao.Rmd"}
+```
 
-Several platforms for creating such documents exist.[@perkel2021] Typically, these documents interleave code and text 'blocks' to build a computational narrative. But some, including [R Markdown](https://rmarkdown.rstudio.com/), [Observable](https://www.observablehq.com), and the [Jupyter Book](https://jupyterbook.org/intro.html) extension to the Jupyter ecosystem, also allow authors to include and execute code "inline" -- that is, within the text itself.
-
-This makes it possible to create fully executable manuscripts in which the document itself computes and inserts values and figures into the text rather than requiring authors to input them manually. This is in many ways the 'killer feature' of computed manuscripts: it circumvents the possibility that the author will enter an incorrect number, or forget to update a figure or value should new data arise. Among other uses, that allows authors to automatically time-stamp their documents, or insert the current version number of the software they use into their methods. For instance, this document was built at **`r format(Sys.time(), "%d %b %Y %H:%M:%S %Z")`** and calls the following R packages: `{tidyverse}` ver. **`r packageVersion("tidyverse")`**, `{ggbeeswarm}` ver. **`r packageVersion("ggbeeswarm")`** and `{bookdown}` ver. **`r packageVersion("bookdown")`**.
-
-In this manuscript, created in RStudio using the R Markdown language, we will demonstrate a more practical example. (An Observable version is [also available](https://observablehq.com/@jperkel/example-executable-observable-notebook).)
 
 # Material e métodos {#material}
 
+```{r get-mm, child="02material.Rmd"}
+```
 
 # Resultados {#resultados}
 
-Imagine we are analyzing data from a clinical trial. We have grouped subjects in three bins and measured the concentration of some metabolite. (These data are simulated.)
-
-```{r initial-data}
-# read in some initial data
-#df1 <- read_csv('data/example-data-1.csv')
+```{r get-mm, child="03resultados.Rmd"}
 ```
-
-```{r radius}
-# radius of a circle
-r = 10
-```
-
-Rather than analyzing those data and then copying the results into our manuscript, we can use the programming language `R` to do that in the manuscript itself. Simply enclose the code inside backticks, with the letter `r`. For instance, we could calculate the circumference and area of a circle `r r`:
-
-$$A = \pi r^2, C = 2 \pi r$$
 
 # Discussão {#discussao}
 
-You could write "A = `` `r
-pi * r^2` `` and C = `` `r
+```{r get-mm, child="04discussao.Rmd"}
+```
 
 # Conclusão {#conclusao}
 
-2 * pi * r` ``". Plugging in the radius *r* = **`r r`**, that evaluates to "A = **`r round(pi * r^2, 2)`** and C = **`r round(2 * pi * r, 2)`**".
+```{r get-mm, child="05conclusao.Rmd"}
+```
 
 # References

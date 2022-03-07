@@ -1,0 +1,240 @@
+---
+title: "02material.Rmd"
+---
+
+```{r packages, echo=FALSE, message=FALSE}
+require(ggplot2)
+require(dplyr)
+require(forestmangr)
+```
+
+O ponto de partida da metodologia deste trabalho foi a construção de uma base simulada para representar o inventário florestal protocolado junto ao processo para solicitação de autorização de intervenção ambiental, que passará a ser chamado de protocolado. Para isto, foram construídos quatro inventários com intensidades amostrais de 15, 20, 25 e 30 parcelas representando uma mesma área. Foram consideradas parcelas de 0,1 ha, sendo o número de árvores gerado a partir de uma distribuição normal de média 54 e desvio padrão 5, e os respectivos diâmetros a altura do peito gerados a partir de uma distribuição Weibull com parâmetro de forma (γ) igual a 2,5 e parâmetro de escala (β) igual a 7 (CERQUEIRA et al, 2017). O diâmetro mínimo de inclusão no inventário considerou árvores com DAP (diâmetro a altura do peito) acima de 5,0 cm (FELFILI et al, 2005). O volume total com casca das árvores individuais foi estimado utilizando a equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
+ 
+$$VTCC = 	-0,0393500 + 0,0118579*DAP - 0,000819184 * DAP^2 + 0,0000413787 * DAP^3$$
+
+```{r parametros, echo=FALSE}
+nparcelas = 30  
+dapMin = 5
+intervaloClasse = 1
+area = 1000
+
+narvMedia = 54
+narvSd = 5
+
+dapWeibullShape = 2.5
+dapWeibullScale = 7
+```
+
+
+```{r eqVol, echo=FALSE}
+VTCC = function(dap){                                                           # modelo para estimar o volume
+  return(-0.0393500+
+           0.0118579*dap-
+           0.000819184*dap^2+
+           0.0000413787*dap^3)
+}
+```
+
+
+```{r florestaSimulada, echo=FALSE}
+inventario = data.frame(parcela = integer(),
+                              arvore = integer(),
+                              dap = double(),
+                              vol = double())
+
+for(i in seq(nparcelas)){                                                       # gera parcelas aleatórias
+  n = ceiling(rnorm(1, narvMedia, narvSd))
+  arvore = seq(n)
+  dap = rweibull(n, dapWeibullShape, dapWeibullScale)
+  vol = VTCC(dap)
+  parcela = rep(i, n)
+  temp = data.frame(parcela, arvore, dap, vol)
+  inventario = rbind(inventario, temp)
+}
+
+# calcula centro de classe de cada árvore
+inventario = subset(inventario, dap >= dapMin)
+inventario$centroClasse = floor(inventario$dap / intervaloClasse) * intervaloClasse + (intervaloClasse/2)
+                                                                                           
+# limpa memória
+rm(n, arvore, dap, vol, parcela, temp, i, intervaloClasse)
+```
+
+A partir das parcelas dos inventários protocolados, 10% foram aleatoriamente escolhidas para representarem as parcelas conferidas pelo agente de fiscalização. Este conjunto foi denominado conferido. Nos inventários com intensidade inferior a 30, foi garantido um mínimo de 3 parcelas aleatoriamente selecionadas para integrar o conjunto conferido. A análise subsequente considerou as duas possibilidades de procedimentos para a conferência dos inventários florestais: (1) comparação entre os dados conferidos e seus respectivos valores protocolados; (2) comparação entre o inventário protocolado e o inventário misto (definido como a união dos 90% protocolado e não conferido com os 10% conferidos). 
+
+Duas abordagens estatísticas foram consideradas para implementar as comparações anteriormente descritas: teste pareado de média (tanto ao nível de árvore quanto ao nível de parcela); e teste de aderência de distribuições (ao nível de árvore). Para a comparação entre médias, ao nível de árvore, foi utilizado o teste t pareado. Já para a comparação de médias do volume em nível de parcela utilizou-se o teste F de Graybill. O teste de aderência foi realizado considerando o teste de Kolmogorov-Smirnov (KS). Foi avaliado ainda o impacto dos desvios intencionalmente inseridos nos dados conferidos no erro amostral do inventário. O desenho metodológico deste trabalho pode ser analisado na Figura 1. 
+
+O banco de dados denominado conferido foi retirado da base de inventário simulada, a comparação direta não apresenta desvio, resultando em testes sempre não significativos. Desta forma, desvios foram adicionados de forma crescente ao conjunto conferido para verificar a partir de qual momento os testes passariam a indicar diferenças significativas entre o conjunto protocolado e o conjunto conferido.
+
+Os desvios adicionados foram gerados de forma aleatória a partir de distribuições com média e desvio padrão crescentes (desvio médio variando de 0 a 1 cm em intervalos de 0,1; desvio-padrão variando de 0,1 a 1 cm em intervalos de 0,1). A adição aleatória foi repetida 100 vezes para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi recalculado a partir da mesma equação de volume.
+
+```{r dfSimulado, echo=FALSE}
+simulacoes = seq(1, 100, 1)
+variacaoErroMedio = seq(0, 1, 0.1)
+variacaoDesvMedio = seq(0.1, 1, 0.1)
+
+simulado = expand.grid(difMedia = variacaoErroMedio,
+                       difSd = variacaoDesvMedio,
+                       sim = simulacoes)
+
+simulado = data.frame(simulado,
+                      erroInv = 0,
+                      erroInvConf = 0,
+                      erroInvProp = 0,
+                      diffErro = 0,
+                      conf_t = 0,
+                      conf_ks = 0,
+                      conf_graybill = 0,
+                      inv_t = 0,
+                      inv_ks = 0,
+                      inv_graybill = 0)
+```
+
+Ao final de cada simulação, os testes estatísticos foram calculados. Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de desvios com média variando de 0 a 1 cm (eixo x), e desvio-padrão variando de 0,1 a 1 cm (eixo y). Para facilitar a visualização das superfícies de solução, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância; valores entre 0,05 e 0,10 indicando uma fraca significância; e valores acima de 0,10 indicando a não significância. O erro amostral para as bases mista e protocolada foram calculados. O erro amostral foi computado considerando um nível de significância de 10%. Os resultados foram apresentados comparando o erro amostral da base mista (na presença de desvio) em relação ao erro amostral da base protocolada.
+
+```{r funcConferencia, echo=FALSE}
+confereInv = function(inventario, areaplot, probConf, nparcelas, mediaDesvio, desvPadDesvio){
+    # sorteia parcelas que serão conferidas pelo órgão
+    parcSorteadas = sample(seq(nparcelas), ifelse(ceiling(probConf*nparcelas) < 3, 3, ceiling(probConf*nparcelas)))
+    conferencia = subset(inventario, 
+                         parcela %in% parcSorteadas)
+    `%notin%` = Negate(`%in%`)
+    naoConferencia = subset(inventario, 
+                            parcela %notin% parcSorteadas)
+    
+    # simula dados conferidos a partir de media e desvio desejado
+    desvio = rnorm(dim(conferencia)[1], mediaDesvio, desvPadDesvio)           # gera desvio aleatório
+    conferencia$dapConferencia = conferencia$dap + desvio
+    conferencia$volConferencia = VTCC(conferencia$dapConferencia)
+    
+    # calcula diferença média estre original e conferido
+    # temp1 = conferencia %>% 
+    #   group_by(parcela) %>%
+    #   summarise(meanDap = mean(dap), meanDapCon = mean(dapConferencia))
+    # difMedia = mean(temp1$meanDap - temp1$meanDapCon)
+    # temp2 = conferencia %>% 
+    #   group_by(parcela) %>%
+    #   summarise(sdDap = sd(dap), sdDapCon = sd(dapConferencia))
+    # difDesvio = mean(temp2$sdDap - temp2$sdDapCon)
+    
+    # junta parcelas conferidas com parcelas não conferidas
+    temp0 = conferencia %>% mutate(vol = volConferencia,
+                                  dap = dapConferencia) %>%
+      select(parcela, arvore, dap, vol, centroClasse)
+    inventarioComConferido = rbind(naoConferencia, temp0)
+    
+    # cria base de inventário com erro observado na conferência
+    inventarioPropagado = inventario
+    inventarioPropagado$dap = inventarioPropagado$dap + rnorm(dim(inventarioPropagado)[1], mediaDesvio, desvPadDesvio)
+    inventarioPropagado$vol = VTCC(inventarioPropagado$dap)
+    
+    # processa inventarios
+    totalizacaoInv = plot_summarise(inventario, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
+    erroInv = sprs(totalizacaoInv, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    
+    totalizacaoInvCom = plot_summarise(inventarioComConferido, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
+    erroInvConf = sprs(totalizacaoInvCom, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    
+    totalizacaoInvProp = plot_summarise(inventarioPropagado, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
+    erroInvProp = sprs(totalizacaoInvProp, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    
+    diffErro = erroInv - erroInvConf
+    
+    # realiza teste t entre original e conferido
+    conf_t = as.numeric(t.test(conferencia$dap, 
+                                    conferencia$dapConferencia, 
+                                    paired = TRUE)[3])
+    
+    # realiza teste KS entre original e conferido
+    conf_ks = as.numeric(ks.test(conferencia$dap, 
+                                      conferencia$dapConferencia)[2])
+    
+    # totaliza parcela para volume
+    # realiza teste graybill entre original e conferido
+    volPlot = conferencia %>% 
+      group_by(parcela) %>%
+      summarise(volOrig = sum(vol)*(areaplot/10000), volConf = sum(volConferencia)*(areaplot/10000))
+    conf_graybill = as.numeric(graybill_f(volPlot, 'volOrig', 'volConf')[3])
+    
+    # realiza teste t entre inventario original e inventario propagado
+    inv_t = as.numeric(t.test(inventario$dap, 
+                                 inventarioPropagado$dap, 
+                                 paired = TRUE)[3])
+    
+    # realiza teste KS entre inventario original e inventario propagado
+    inv_ks = as.numeric(ks.test(inventario$dap, 
+                                   inventarioPropagado$dap)[2])
+    
+    # totaliza parcela para volume
+    # realiza teste graybill entre inventario original e inventario propagado
+    volOriginal = inventario %>% 
+      group_by(parcela) %>%
+      summarise(volOrig = sum(vol)*(areaplot/10000))
+    volPropagado = inventarioPropagado %>% 
+      group_by(parcela) %>%
+      summarise(volOrig = sum(vol)*(areaplot/10000))
+    temp = merge(volOriginal, volPropagado, by = 'parcela')
+    inv_graybill = as.numeric(graybill_f(temp, 'volOrig.x', 'volOrig.y')[3])
+    
+    return(data.frame(erroInv = erroInv,
+                      erroInvConf = erroInvConf,
+                      erroInvProp = erroInvProp,
+                      diffErro = diffErro,
+                      conf_t = conf_t,
+                      conf_ks = conf_ks,
+                      conf_graybill = conf_graybill,
+                      inv_t = inv_t,
+                      inv_ks = inv_ks,
+                      inv_graybill = inv_graybill))
+}
+```
+
+
+```{r rodaSimulacao, echo=FALSE, eval=FALSE}
+
+for(i in 1:dim(simulado)[1]){
+  simulado[i,4:13] = confereInv(inventario = inventario, areaplot = 10000, 
+                        probConf = 0.1, nparcelas = nparcelas, 
+                        mediaDesvio = simulado$difMedia[i], 
+                        desvPadDesvio = simulado$difSd[i])
+}
+
+simuladoAggregate = simulado %>%
+  group_by(difMedia, difSd) %>%
+  summarise(erroInv = mean(erroInv),
+            erroInvConf = mean(erroInvConf),
+            erroInvProp = mean(erroInvProp),
+            diffErro = mean(diffErro),
+            conf_t = mean(conf_t),
+            conf_ks = mean(conf_ks),
+            conf_graybill = mean(conf_graybill),
+            inv_t = mean(inv_t),
+            inv_ks = mean(inv_ks),
+            inv_graybill = mean(inv_graybill))
+
+#write.csv(simuladoAggregate, 'simulado30.csv')
+```
+
+```{r readSimulado, echo = FALSE}
+simulado15 = read.csv('simulado15.csv')
+simulado15 = simulado15 %>%
+  mutate(sim = 15)
+
+simulado20 = read.csv('simulado20.csv')
+simulado20 = simulado20 %>%
+  mutate(sim = 20)
+
+simulado25 = read.csv('simulado25.csv')
+simulado25 = simulado25 %>%
+  mutate(sim = 25)
+
+simulado30 = read.csv('simulado30.csv')
+simulado30 = simulado30 %>%
+  mutate(sim = 30)
+
+simulado = rbind(simulado15,
+                 simulado20,
+                 simulado25,
+                 simulado30)
+
+```
