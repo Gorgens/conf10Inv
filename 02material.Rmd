@@ -63,86 +63,77 @@ simulado = data.frame(simulado,
 Ao final de cada simulação, os testes estatísticos foram calculados. Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de desvios com média variando de 0 a 1 cm (eixo x), e desvio-padrão variando de 0,1 a 1 cm (eixo y). Para facilitar a visualização das superfícies de solução, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância; valores entre 0,05 e 0,10 indicando uma fraca significância; e valores acima de 0,10 indicando a não significância. O erro amostral para as bases mista e protocolada foram calculados. O erro amostral foi computado considerando um nível de significância de 10%. Os resultados foram apresentados comparando o erro amostral da base mista (na presença de desvio) em relação ao erro amostral da base protocolada.
 
 ```{r funcConferencia, echo=FALSE}
-confereInv = function(inventario, areaplot, probConf, nparcelas, mediaDesvio, desvPadDesvio){
+confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, mediaDesvio = 0.1, desvPadDesvio=0.1){
     # sorteia parcelas que serão conferidas pelo órgão
-    parcSorteadas = sample(seq(nparcelas), ifelse(ceiling(probConf*nparcelas) < 3, 3, ceiling(probConf*nparcelas)))
-    conferencia = subset(inventario, 
-                         parcela %in% parcSorteadas)
+    parcSorteadas = sample(unique(inventario$parcela), ifelse(ceiling(probConf*nparcelas) < 3, 3, ceiling(probConf*nparcelas)))
+    conferencia = subset(inventario, parcela %in% parcSorteadas) %>% 
+      select(parcela, fuste, d, v)
     `%notin%` = Negate(`%in%`)
-    naoConferencia = subset(inventario, 
-                            parcela %notin% parcSorteadas)
+    naoConferencia = subset(inventario, parcela %notin% parcSorteadas) %>% 
+      select(parcela, fuste, d, v)
     
     # simula dados conferidos a partir de media e desvio desejado
-    desvio = rnorm(dim(conferencia)[1], mediaDesvio, desvPadDesvio)           # gera desvio aleatório
-    conferencia$dapConferencia = conferencia$dap + desvio
-    conferencia$volConferencia = VTCC(conferencia$dapConferencia)
-    
-    # calcula diferença média estre original e conferido
-    # temp1 = conferencia %>% 
-    #   group_by(parcela) %>%
-    #   summarise(meanDap = mean(dap), meanDapCon = mean(dapConferencia))
-    # difMedia = mean(temp1$meanDap - temp1$meanDapCon)
-    # temp2 = conferencia %>% 
-    #   group_by(parcela) %>%
-    #   summarise(sdDap = sd(dap), sdDapCon = sd(dapConferencia))
-    # difDesvio = mean(temp2$sdDap - temp2$sdDapCon)
+    # gera desvio aleatório
+    desvio = rnorm(dim(conferencia)[1], mediaDesvio, desvPadDesvio)           
+    conferencia$dConferencia = conferencia$d + desvio
+    conferencia$vConferencia = VTCC(conferencia$dConferencia)
     
     # junta parcelas conferidas com parcelas não conferidas
-    temp0 = conferencia %>% mutate(vol = volConferencia,
-                                  dap = dapConferencia) %>%
-      select(parcela, arvore, dap, vol, centroClasse)
+    temp0 = conferencia %>% 
+      mutate(v = vConferencia, d = dConferencia) %>%
+      select(parcela, fuste, d, v)
     inventarioComConferido = rbind(naoConferencia, temp0)
     
     # cria base de inventário com erro observado na conferência
     inventarioPropagado = inventario
-    inventarioPropagado$dap = inventarioPropagado$dap + rnorm(dim(inventarioPropagado)[1], mediaDesvio, desvPadDesvio)
-    inventarioPropagado$vol = VTCC(inventarioPropagado$dap)
+    inventarioPropagado$d = inventarioPropagado$d + rnorm(dim(inventarioPropagado)[1], mediaDesvio, desvPadDesvio)
+    inventarioPropagado$v = VTCC(inventarioPropagado$d)
     
     # processa inventarios
-    totalizacaoInv = plot_summarise(inventario, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
-    erroInv = sprs(totalizacaoInv, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    totalizacaoInv = plot_summarise(inventario, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    erroInv = sprs(totalizacaoInv, 'v_ha', 'plot_area', total_area = 1)[12,2]
     
-    totalizacaoInvCom = plot_summarise(inventarioComConferido, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
-    erroInvConf = sprs(totalizacaoInvCom, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    totalizacaoInvCom = plot_summarise(inventarioComConferido, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    erroInvConf = sprs(totalizacaoInvCom, 'v_ha', 'plot_area', total_area = 1)[12,2]
     
-    totalizacaoInvProp = plot_summarise(inventarioPropagado, "parcela", plot_area = areaplot, dbh = "dap", vwb = 'vol')
-    erroInvProp = sprs(totalizacaoInvProp, 'vol_ha', 'plot_area', total_area = 1)[12,2]
+    totalizacaoInvProp = plot_summarise(inventarioPropagado, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    erroInvProp = sprs(totalizacaoInvProp, 'v_ha', 'plot_area', total_area = 1)[12,2]
     
     diffErro = erroInv - erroInvConf
     
     # realiza teste t entre original e conferido
-    conf_t = as.numeric(t.test(conferencia$dap, 
-                                    conferencia$dapConferencia, 
+    conf_t = as.numeric(t.test(conferencia$d, 
+                                    conferencia$dConferencia, 
                                     paired = TRUE)[3])
     
     # realiza teste KS entre original e conferido
-    conf_ks = as.numeric(ks.test(conferencia$dap, 
-                                      conferencia$dapConferencia)[2])
+    conf_ks = as.numeric(ks.test(conferencia$d, 
+                                      conferencia$dConferencia)[2])
     
     # totaliza parcela para volume
     # realiza teste graybill entre original e conferido
     volPlot = conferencia %>% 
       group_by(parcela) %>%
-      summarise(volOrig = sum(vol)*(areaplot/10000), volConf = sum(volConferencia)*(areaplot/10000))
+      summarise(volOrig = sum(v)*(areaplot/10000), volConf = sum(vConferencia)*(areaplot/10000))
     conf_graybill = as.numeric(graybill_f(volPlot, 'volOrig', 'volConf')[3])
     
     # realiza teste t entre inventario original e inventario propagado
-    inv_t = as.numeric(t.test(inventario$dap, 
-                                 inventarioPropagado$dap, 
+    inv_t = as.numeric(t.test(inventario$d, 
+                                 inventarioPropagado$d, 
                                  paired = TRUE)[3])
     
     # realiza teste KS entre inventario original e inventario propagado
-    inv_ks = as.numeric(ks.test(inventario$dap, 
-                                   inventarioPropagado$dap)[2])
+    inv_ks = as.numeric(ks.test(inventario$d, 
+                                   inventarioPropagado$d)[2])
     
     # totaliza parcela para volume
     # realiza teste graybill entre inventario original e inventario propagado
     volOriginal = inventario %>% 
       group_by(parcela) %>%
-      summarise(volOrig = sum(vol)*(areaplot/10000))
+      summarise(volOrig = sum(v)*(areaplot/10000))
     volPropagado = inventarioPropagado %>% 
       group_by(parcela) %>%
-      summarise(volOrig = sum(vol)*(areaplot/10000))
+      summarise(volOrig = sum(v)*(areaplot/10000))
     temp = merge(volOriginal, volPropagado, by = 'parcela')
     inv_graybill = as.numeric(graybill_f(temp, 'volOrig.x', 'volOrig.y')[3])
     
@@ -160,11 +151,11 @@ confereInv = function(inventario, areaplot, probConf, nparcelas, mediaDesvio, de
 ```
 
 
-```{r rodaSimulacao, echo=FALSE, eval=FALSE}
+```{r rodaSimulacao, echo=FALSE, eval=FALSE, message=FALSE}
 
 for(i in 1:dim(simulado)[1]){
-  simulado[i,4:13] = confereInv(inventario = censo, areaplot = 10000, 
-                        probConf = 0.1, nparcelas = nparcelas, 
+  simulado[i,4:13] = confereInv(inventario = nativa, areaplot = 400, 
+                        probConf = 0.1, nparcelas = 10, 
                         mediaDesvio = simulado$difMedia[i], 
                         desvPadDesvio = simulado$difSd[i])
 }
@@ -182,6 +173,5 @@ simuladoAggregate = simulado %>%
             inv_ks = mean(inv_ks),
             inv_graybill = mean(inv_graybill))
 
-#write.csv(simuladoAggregate, 'simulado30.csv')
 ```
 
