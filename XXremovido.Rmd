@@ -1,0 +1,40 @@
+## Removidos
+
+```{r parametros, echo=FALSE}
+nparcelas = 30  
+dapMin = 5
+intervaloClasse = 1
+area = 1000
+
+narvMedia = 54
+narvSd = 5
+
+dapWeibullShape = 2.5
+dapWeibullScale = 7
+```
+
+
+```{r florestaSimulada, echo=FALSE}
+inventario = data.frame(parcela = integer(),
+                              arvore = integer(),
+                              dap = double(),
+                              vol = double())
+
+for(i in seq(nparcelas)){                                                       # gera parcelas aleatórias
+  n = ceiling(rnorm(1, narvMedia, narvSd))
+  arvore = seq(n)
+  dap = rweibull(n, dapWeibullShape, dapWeibullScale)
+  vol = VTCC(dap)
+  parcela = rep(i, n)
+  temp = data.frame(parcela, arvore, dap, vol)
+  inventario = rbind(inventario, temp)
+}
+
+# calcula centro de classe de cada árvore
+inventario = subset(inventario, dap >= dapMin)
+inventario$centroClasse = floor(inventario$dap / intervaloClasse) * intervaloClasse + (intervaloClasse/2)
+                                                                                           
+# limpa memória
+rm(n, arvore, dap, vol, parcela, temp, i, intervaloClasse)
+```
+

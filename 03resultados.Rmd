@@ -2,7 +2,6 @@
 title: "03resultados.Rmd"
 ---
 
-
 A sensibilidade do Teste t para comparar os diâmetros das árvores do inventário protocolado (protocolado) com as mesmas árvores da conferência em campo (conferido) apresentou alta sensibilidade, acusando significância estatística para diferenças médias no diâmetro a partir de 0,10 cm e desvio padrão de 0,1. Com o aumento do desvio padrão das diferenças, houve uma leve redução na sensibilidade do teste, passando a acusar diferença estatística para desvios médios de 0,25 cm quando o desvio padrão acima de 0,85 cm (Figura 2). Seguindo as regras atualmente vigentes para a conferência de inventário em campo, as quatro intensidades amostrais simuladas resultaram na conferência de 3 parcelas de campo. Assim, o impacto de diferentes médias e desvios padrões foi semelhante nas simulações realizadas.
 
 ```{r plotTestet, echo = FALSE}
