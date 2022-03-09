@@ -38,3 +38,26 @@ inventario$centroClasse = floor(inventario$dap / intervaloClasse) * intervaloCla
 rm(n, arvore, dap, vol, parcela, temp, i, intervaloClasse)
 ```
 
+```{r readSimulado, echo = FALSE}
+simulado15 = read.csv('dados_v1/simulado15.csv')
+simulado15 = simulado15 %>%
+  mutate(sim = 15)
+
+simulado20 = read.csv('dados_v1/simulado20.csv')
+simulado20 = simulado20 %>%
+  mutate(sim = 20)
+
+simulado25 = read.csv('dados_v1/simulado25.csv')
+simulado25 = simulado25 %>%
+  mutate(sim = 25)
+
+simulado30 = read.csv('dados_v1/simulado30.csv')
+simulado30 = simulado30 %>%
+  mutate(sim = 30)
+
+simulado = rbind(simulado15,
+                 simulado20,
+                 simulado25,
+                 simulado30)
+
+```

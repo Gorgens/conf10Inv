@@ -17,10 +17,7 @@ nativa = readxl::read_xlsx('dados_v2/nativa.xlsx')
 plantada = readxl::read_xlsx('dados_v2/plantada.xlsx')
 ```
 
-
-
-
-e deverão ser analisados dentro do escopo do processo dos quais fazem parte. são realiz protocolado junto ao processo para solicitação de autorização de intervenção ambiental, que passará a ser chamado de protocolado. Para isto, foram construídos quatro inventários com intensidades amostrais de 15, 20, 25 e 30 parcelas representando uma mesma área. Foram consideradas parcelas de 0,1 ha, sendo o número de árvores gerado a partir de uma distribuição normal de média 54 e desvio padrão 5, e os respectivos diâmetros a altura do peito gerados a partir de uma distribuição Weibull com parâmetro de forma (γ) igual a 2,5 e parâmetro de escala (β) igual a 7 (CERQUEIRA et al, 2017). O diâmetro mínimo de inclusão no inventário considerou árvores com DAP (diâmetro a altura do peito) acima de 5,0 cm (FELFILI et al, 2005). O volume total com casca das árvores individuais foi estimado utilizando a equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
+O volume total com casca das árvores individuais foi estimado utilizando a equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
  
 $$VTCC = 	-0,0393500 + 0,0118579*DAP - 0,000819184 * DAP^2 + 0,0000413787 * DAP^3$$
 
@@ -33,14 +30,13 @@ VTCC = function(dap){                                                           
 }
 ```
 
-
-A partir das parcelas dos inventários protocolados, 10% foram aleatoriamente escolhidas para representarem as parcelas conferidas pelo agente de fiscalização. Este conjunto foi denominado conferido. Nos inventários com intensidade inferior a 30, foi garantido um mínimo de 3 parcelas aleatoriamente selecionadas para integrar o conjunto conferido. A análise subsequente considerou as duas possibilidades de procedimentos para a conferência dos inventários florestais: (1) comparação entre os dados conferidos e seus respectivos valores protocolados; (2) comparação entre o inventário protocolado e o inventário misto (definido como a união dos 90% protocolado e não conferido com os 10% conferidos). 
-
 Duas abordagens estatísticas foram consideradas para implementar as comparações anteriormente descritas: teste pareado de média (tanto ao nível de árvore quanto ao nível de parcela); e teste de aderência de distribuições (ao nível de árvore). Para a comparação entre médias, ao nível de árvore, foi utilizado o teste t pareado. Já para a comparação de médias do volume em nível de parcela utilizou-se o teste F de Graybill. O teste de aderência foi realizado considerando o teste de Kolmogorov-Smirnov (KS). Foi avaliado ainda o impacto dos desvios intencionalmente inseridos nos dados conferidos no erro amostral do inventário. O desenho metodológico deste trabalho pode ser analisado na Figura 1. 
 
 O banco de dados denominado conferido foi retirado da base de inventário simulada, a comparação direta não apresenta desvio, resultando em testes sempre não significativos. Desta forma, desvios foram adicionados de forma crescente ao conjunto conferido para verificar a partir de qual momento os testes passariam a indicar diferenças significativas entre o conjunto protocolado e o conjunto conferido.
 
 Os desvios adicionados foram gerados de forma aleatória a partir de distribuições com média e desvio padrão crescentes (desvio médio variando de 0 a 1 cm em intervalos de 0,1; desvio-padrão variando de 0,1 a 1 cm em intervalos de 0,1). A adição aleatória foi repetida 100 vezes para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi recalculado a partir da mesma equação de volume.
+
+A partir das parcelas dos inventários protocolados, 10% foram aleatoriamente escolhidas para representarem as parcelas conferidas pelo agente de fiscalização. Este conjunto foi denominado conferido. Nos inventários com intensidade inferior a 30, foi garantido um mínimo de 3 parcelas aleatoriamente selecionadas para integrar o conjunto conferido. A análise subsequente considerou as duas possibilidades de procedimentos para a conferência dos inventários florestais: (1) comparação entre os dados conferidos e seus respectivos valores protocolados; (2) comparação entre o inventário protocolado e o inventário misto (definido como a união dos 90% protocolado e não conferido com os 10% conferidos). 
 
 ```{r dfSimulado, echo=FALSE}
 simulacoes = seq(1, 100, 1)
@@ -167,7 +163,7 @@ confereInv = function(inventario, areaplot, probConf, nparcelas, mediaDesvio, de
 ```{r rodaSimulacao, echo=FALSE, eval=FALSE}
 
 for(i in 1:dim(simulado)[1]){
-  simulado[i,4:13] = confereInv(inventario = inventario, areaplot = 10000, 
+  simulado[i,4:13] = confereInv(inventario = censo, areaplot = 10000, 
                         probConf = 0.1, nparcelas = nparcelas, 
                         mediaDesvio = simulado$difMedia[i], 
                         desvPadDesvio = simulado$difSd[i])
@@ -189,26 +185,3 @@ simuladoAggregate = simulado %>%
 #write.csv(simuladoAggregate, 'simulado30.csv')
 ```
 
-```{r readSimulado, echo = FALSE}
-simulado15 = read.csv('dados_v1/simulado15.csv')
-simulado15 = simulado15 %>%
-  mutate(sim = 15)
-
-simulado20 = read.csv('dados_v1/simulado20.csv')
-simulado20 = simulado20 %>%
-  mutate(sim = 20)
-
-simulado25 = read.csv('dados_v1/simulado25.csv')
-simulado25 = simulado25 %>%
-  mutate(sim = 25)
-
-simulado30 = read.csv('dados_v1/simulado30.csv')
-simulado30 = simulado30 %>%
-  mutate(sim = 30)
-
-simulado = rbind(simulado15,
-                 simulado20,
-                 simulado25,
-                 simulado30)
-
-```
