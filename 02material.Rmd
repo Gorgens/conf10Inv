@@ -8,7 +8,7 @@ require(dplyr)
 require(forestmangr)
 ```
 
-Quatro diferentes tipos de inventários foram incluídas nesta análise: (1) inventário amostral em floresta nativa, (2) inventário censitário em floresta nativa, (3) inventário amostral em empreendimentos lineares, e (4) inventário amostral em florestas plantadas. Entende-se que estes quatro inventários foram realizados pelo empreendedor e protocolados junto ao órgão ambiental. 
+Quatro diferentes tipos de inventários foram incluídas nesta análise: (1) inventário amostral em floresta nativa, (2) inventário censitário em floresta nativa, (3) inventário amostral em empreendimentos lineares, e (4) inventário amostral em florestas plantadas. Entende-se que estes quatro inventários representam coletas realizadas pelo empreendedor e protocolados junto ao órgão ambiental. 
 
 ```{r inventarios, echo=FALSE, message=FALSE}
 censo = readxl::read_xlsx('dados_v2/censo.xlsx')
@@ -17,7 +17,18 @@ nativa = readxl::read_xlsx('dados_v2/nativa.xlsx')
 plantada = readxl::read_xlsx('dados_v2/plantada.xlsx')
 ```
 
-O volume total com casca das árvores individuais foi estimado utilizando a equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
+Para cada inventário florestal analisado, serão adicionados aos diâmetros das árvores presentes um valor aleatório de erro. Estes erros aleatórios serao gerados considerando uma distribuição normal com média e desvio padrão conhecidos. Em seguida, duas abordagens de conferência serão consideradas para compreender a sensibilidade da conferência para detectar erros na medição do diâmetro. Na primeira abordagem, 10% das unidades amostrais serão separadas, e os valors originais para o diâmetro serão comparados aos diâmetros contendo erros aleatórios. A comparação será realizada pelo teste de médias t para amostras pareadas, e o teste de aderência Kolmogorov-Smirnov (KS) para duas distribuições. 
+
+O teste t é defindo pela fórmula:
+
+$$t = \frac{m}{\frac{s}{\sqrt(n)}}$$
+em que $m$ é a média das diferenças, $n$ é o tamanho a amostra e $s$ é o desvio padrão das diferenças.
+
+O teste de KS é uma comparação de funções de distribuição acumuladas, testando para a máxima diferença observada:
+
+$$D^+ = max[F_x(u) - F_y(u)]$$
+
+Na segunda abordagem, será analisada a diferença entre o erro amostral do inventario protocolado e o erro amostral do inventário, assumindo a presença de um erro aleatório. O volume total com casca das árvores individuais foi estimado utilizando a equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
  
 $$VTCC = 	-0,0393500 + 0,0118579*DAP - 0,000819184 * DAP^2 + 0,0000413787 * DAP^3$$
 
@@ -30,38 +41,6 @@ VTCC = function(dap){                                                           
 }
 ```
 
-Duas abordagens estatísticas foram consideradas para implementar as comparações anteriormente descritas: teste pareado de média (tanto ao nível de árvore quanto ao nível de parcela); e teste de aderência de distribuições (ao nível de árvore). Para a comparação entre médias, ao nível de árvore, foi utilizado o teste t pareado. Já para a comparação de médias do volume em nível de parcela utilizou-se o teste F de Graybill. O teste de aderência foi realizado considerando o teste de Kolmogorov-Smirnov (KS). Foi avaliado ainda o impacto dos desvios intencionalmente inseridos nos dados conferidos no erro amostral do inventário. O desenho metodológico deste trabalho pode ser analisado na Figura 1. 
-
-O banco de dados denominado conferido foi retirado da base de inventário simulada, a comparação direta não apresenta desvio, resultando em testes sempre não significativos. Desta forma, desvios foram adicionados de forma crescente ao conjunto conferido para verificar a partir de qual momento os testes passariam a indicar diferenças significativas entre o conjunto protocolado e o conjunto conferido.
-
-Os desvios adicionados foram gerados de forma aleatória a partir de distribuições com média e desvio padrão crescentes (desvio médio variando de 0 a 1 cm em intervalos de 0,1; desvio-padrão variando de 0,1 a 1 cm em intervalos de 0,1). A adição aleatória foi repetida 100 vezes para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi recalculado a partir da mesma equação de volume.
-
-A partir das parcelas dos inventários protocolados, 10% foram aleatoriamente escolhidas para representarem as parcelas conferidas pelo agente de fiscalização. Este conjunto foi denominado conferido. Nos inventários com intensidade inferior a 30, foi garantido um mínimo de 3 parcelas aleatoriamente selecionadas para integrar o conjunto conferido. A análise subsequente considerou as duas possibilidades de procedimentos para a conferência dos inventários florestais: (1) comparação entre os dados conferidos e seus respectivos valores protocolados; (2) comparação entre o inventário protocolado e o inventário misto (definido como a união dos 90% protocolado e não conferido com os 10% conferidos). 
-
-```{r dfSimulado, echo=FALSE}
-simulacoes = seq(1, 100, 1)
-variacaoErroMedio = seq(0, 1, 0.1)
-variacaoDesvMedio = seq(0.1, 1, 0.1)
-
-simulado = expand.grid(difMedia = variacaoErroMedio,
-                       difSd = variacaoDesvMedio,
-                       sim = simulacoes)
-
-simulado = data.frame(simulado,
-                      erroInv = 0,
-                      erroInvConf = 0,
-                      erroInvProp = 0,
-                      diffErro = 0,
-                      conf_t = 0,
-                      conf_ks = 0,
-                      conf_graybill = 0,
-                      inv_t = 0,
-                      inv_ks = 0,
-                      inv_graybill = 0)
-```
-
-Ao final de cada simulação, os testes estatísticos foram calculados. Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de desvios com média variando de 0 a 1 cm (eixo x), e desvio-padrão variando de 0,1 a 1 cm (eixo y). Para facilitar a visualização das superfícies de solução, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância; valores entre 0,05 e 0,10 indicando uma fraca significância; e valores acima de 0,10 indicando a não significância. O erro amostral para as bases mista e protocolada foram calculados. O erro amostral foi computado considerando um nível de significância de 10%. Os resultados foram apresentados comparando o erro amostral da base mista (na presença de desvio) em relação ao erro amostral da base protocolada.
-
 ```{r funcConferencia, echo=FALSE}
 confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, mediaDesvio = 0.1, desvPadDesvio=0.1){
     # sorteia parcelas que serão conferidas pelo órgão
@@ -72,19 +51,18 @@ confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, medi
     naoConferencia = subset(inventario, parcela %notin% parcSorteadas) %>% 
       select(parcela, fuste, d, v)
     
-    # simula dados conferidos a partir de media e desvio desejado
-    # gera desvio aleatório
+    # adiciona nas parcelas conferidas um erro aleatório com distribuição de média e desvio padrão definidos pelo usuário
     desvio = rnorm(dim(conferencia)[1], mediaDesvio, desvPadDesvio)           
     conferencia$dConferencia = conferencia$d + desvio
     conferencia$vConferencia = VTCC(conferencia$dConferencia)
     
-    # junta parcelas conferidas com parcelas não conferidas
+    # retorna os dados conferidos para a base de dados
     temp0 = conferencia %>% 
       mutate(v = vConferencia, d = dConferencia) %>%
       select(parcela, fuste, d, v)
     inventarioComConferido = rbind(naoConferencia, temp0)
     
-    # cria base de inventário com erro observado na conferência
+    # recria a base de inventário adicionando um erro aleatório com distribuição de média e desvio padrão definidos pelo usuário
     inventarioPropagado = inventario
     inventarioPropagado$d = inventarioPropagado$d + rnorm(dim(inventarioPropagado)[1], mediaDesvio, desvPadDesvio)
     inventarioPropagado$v = VTCC(inventarioPropagado$d)
@@ -93,13 +71,10 @@ confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, medi
     totalizacaoInv = plot_summarise(inventario, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
     erroInv = sprs(totalizacaoInv, 'v_ha', 'plot_area', total_area = 1)[12,2]
     
-    totalizacaoInvCom = plot_summarise(inventarioComConferido, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
-    erroInvConf = sprs(totalizacaoInvCom, 'v_ha', 'plot_area', total_area = 1)[12,2]
-    
     totalizacaoInvProp = plot_summarise(inventarioPropagado, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
     erroInvProp = sprs(totalizacaoInvProp, 'v_ha', 'plot_area', total_area = 1)[12,2]
     
-    diffErro = erroInv - erroInvConf
+    diffErro = erroInv - erroInvProp
     
     # realiza teste t entre original e conferido
     conf_t = as.numeric(t.test(conferencia$d, 
@@ -110,46 +85,38 @@ confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, medi
     conf_ks = as.numeric(ks.test(conferencia$d, 
                                       conferencia$dConferencia)[2])
     
-    # totaliza parcela para volume
-    # realiza teste graybill entre original e conferido
-    volPlot = conferencia %>% 
-      group_by(parcela) %>%
-      summarise(volOrig = sum(v)*(areaplot/10000), volConf = sum(vConferencia)*(areaplot/10000))
-    conf_graybill = as.numeric(graybill_f(volPlot, 'volOrig', 'volConf')[3])
-    
-    # realiza teste t entre inventario original e inventario propagado
-    inv_t = as.numeric(t.test(inventario$d, 
-                                 inventarioPropagado$d, 
-                                 paired = TRUE)[3])
-    
-    # realiza teste KS entre inventario original e inventario propagado
-    inv_ks = as.numeric(ks.test(inventario$d, 
-                                   inventarioPropagado$d)[2])
-    
-    # totaliza parcela para volume
-    # realiza teste graybill entre inventario original e inventario propagado
-    volOriginal = inventario %>% 
-      group_by(parcela) %>%
-      summarise(volOrig = sum(v)*(areaplot/10000))
-    volPropagado = inventarioPropagado %>% 
-      group_by(parcela) %>%
-      summarise(volOrig = sum(v)*(areaplot/10000))
-    temp = merge(volOriginal, volPropagado, by = 'parcela')
-    inv_graybill = as.numeric(graybill_f(temp, 'volOrig.x', 'volOrig.y')[3])
-    
+
     return(data.frame(erroInv = erroInv,
-                      erroInvConf = erroInvConf,
                       erroInvProp = erroInvProp,
                       diffErro = diffErro,
                       conf_t = conf_t,
-                      conf_ks = conf_ks,
-                      conf_graybill = conf_graybill,
-                      inv_t = inv_t,
-                      inv_ks = inv_ks,
-                      inv_graybill = inv_graybill))
+                      conf_ks = conf_ks))
 }
 ```
 
+Para avaliar a sensibilidade das duas abordagens de análise dos inventários florestais, os erros aleatórios que incidirão nos diâmetros, serão gerados por uma distribuição normal com diferentes combinações médias e desvios-padrão. O média variou de 0 a 1 cm, em intervalos de 0,1; e o desvio-padrão variou de 0,1 a 1 cm, em intervalos de 0,1). A geração aleatória dos erros, serão repetidos 100 vezes, para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi recalculado a partir da mesma equação de volume.
+
+```{r dfSimulado, echo=FALSE}
+simulacoes = seq(1, 10, 1)
+
+# Define possíveis médias para o erro em relação ao diâmetro
+variacaoErroMedio = seq(0, 1, 0.2)
+# Define possíveis desvios-padrão para o erro em relação ao diâmetro
+variacaoDesvMedio = seq(0.1, 1, 0.2)
+
+simulado = expand.grid(difMedia = variacaoErroMedio,
+                       difSd = variacaoDesvMedio,
+                       sim = simulacoes)
+
+simulado = data.frame(simulado,
+                      erroInv = 0,
+                      erroInvProp = 0,
+                      diffErro = 0,
+                      conf_t = 0,
+                      conf_ks = 0)
+```
+
+Ao final de cada simulação, os testes estatísticos foram calculados. Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de um erro aleatorio no inventário. Para facilitar a visualização da análise de sensibilidade, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância (presença significativa de erros de medição); valores entre 0,05 e 0,10 indicando uma fraca significância (indícios de erros de medição); e valores acima de 0,10 indicando a não significância (presença não significativa de erros de medição). Os testes estatísticos, bem como o erro amostral foram computados considerando um nível de significância de 10%.
 
 ```{r rodaSimulacao, echo=FALSE, eval=FALSE, message=FALSE}
 
@@ -163,15 +130,10 @@ for(i in 1:dim(simulado)[1]){
 simuladoAggregate = simulado %>%
   group_by(difMedia, difSd) %>%
   summarise(erroInv = mean(erroInv),
-            erroInvConf = mean(erroInvConf),
             erroInvProp = mean(erroInvProp),
             diffErro = mean(diffErro),
             conf_t = mean(conf_t),
-            conf_ks = mean(conf_ks),
-            conf_graybill = mean(conf_graybill),
-            inv_t = mean(inv_t),
-            inv_ks = mean(inv_ks),
-            inv_graybill = mean(inv_graybill))
+            conf_ks = mean(conf_ks))
 
 ```
 

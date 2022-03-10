@@ -61,3 +61,91 @@ simulado = rbind(simulado15,
                  simulado30)
 
 ```
+
+
+```{r funcConferencia, echo=FALSE}
+confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, mediaDesvio = 0.1, desvPadDesvio=0.1){
+    # sorteia parcelas que serão conferidas pelo órgão
+    parcSorteadas = sample(unique(inventario$parcela), ifelse(ceiling(probConf*nparcelas) < 3, 3, ceiling(probConf*nparcelas)))
+    conferencia = subset(inventario, parcela %in% parcSorteadas) %>% 
+      select(parcela, fuste, d, v)
+    `%notin%` = Negate(`%in%`)
+    naoConferencia = subset(inventario, parcela %notin% parcSorteadas) %>% 
+      select(parcela, fuste, d, v)
+    
+    # adiciona nas parcelas conferidas um erro aleatório com distribuição de média e desvio padrão definidos pelo usuário
+    desvio = rnorm(dim(conferencia)[1], mediaDesvio, desvPadDesvio)           
+    conferencia$dConferencia = conferencia$d + desvio
+    conferencia$vConferencia = VTCC(conferencia$dConferencia)
+    
+    # retorna os dados conferidos para a base de dados
+    temp0 = conferencia %>% 
+      mutate(v = vConferencia, d = dConferencia) %>%
+      select(parcela, fuste, d, v)
+    inventarioComConferido = rbind(naoConferencia, temp0)
+    
+    # recria a base de inventário adicionando um erro aleatório com distribuição de média e desvio padrão definidos pelo usuário
+    inventarioPropagado = inventario
+    inventarioPropagado$d = inventarioPropagado$d + rnorm(dim(inventarioPropagado)[1], mediaDesvio, desvPadDesvio)
+    inventarioPropagado$v = VTCC(inventarioPropagado$d)
+    
+    # processa inventarios
+    totalizacaoInv = plot_summarise(inventario, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    erroInv = sprs(totalizacaoInv, 'v_ha', 'plot_area', total_area = 1)[12,2]
+    
+    # totalizacaoInvCom = plot_summarise(inventarioComConferido, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    # erroInvConf = sprs(totalizacaoInvCom, 'v_ha', 'plot_area', total_area = 1)[12,2]
+    
+    totalizacaoInvProp = plot_summarise(inventarioPropagado, "parcela", plot_area = areaplot, dbh = "d", vwb = 'v')
+    erroInvProp = sprs(totalizacaoInvProp, 'v_ha', 'plot_area', total_area = 1)[12,2]
+    
+    diffErro = erroInv - erroInvProp
+    
+    # realiza teste t entre original e conferido
+    conf_t = as.numeric(t.test(conferencia$d, 
+                                    conferencia$dConferencia, 
+                                    paired = TRUE)[3])
+    
+    # realiza teste KS entre original e conferido
+    conf_ks = as.numeric(ks.test(conferencia$d, 
+                                      conferencia$dConferencia)[2])
+    
+    # totaliza parcela para volume
+    # realiza teste graybill entre original e conferido
+    # volPlot = conferencia %>% 
+    #   group_by(parcela) %>%
+    #   summarise(volOrig = sum(v)*(areaplot/10000), volConf = sum(vConferencia)*(areaplot/10000))
+    # conf_graybill = as.numeric(graybill_f(volPlot, 'volOrig', 'volConf')[3])
+    
+    # realiza teste t entre inventario original e inventario propagado
+    # inv_t = as.numeric(t.test(inventario$d, 
+    #                              inventarioPropagado$d, 
+    #                              paired = TRUE)[3])
+    # 
+    # realiza teste KS entre inventario original e inventario propagado
+    # inv_ks = as.numeric(ks.test(inventario$d, 
+    #                                inventarioPropagado$d)[2])
+    # 
+    # totaliza parcela para volume
+    # realiza teste graybill entre inventario original e inventario propagado
+    # volOriginal = inventario %>% 
+    #   group_by(parcela) %>%
+    #   summarise(volOrig = sum(v)*(areaplot/10000))
+    # volPropagado = inventarioPropagado %>% 
+    #   group_by(parcela) %>%
+    #   summarise(volOrig = sum(v)*(areaplot/10000))
+    # temp = merge(volOriginal, volPropagado, by = 'parcela')
+    # inv_graybill = as.numeric(graybill_f(temp, 'volOrig.x', 'volOrig.y')[3])
+    
+    return(data.frame(erroInv = erroInv,
+                      erroInvConf = erroInvConf,
+                      erroInvProp = erroInvProp,
+                      diffErro = diffErro,
+                      conf_t = conf_t,
+                      conf_ks = conf_ks,
+                      conf_graybill = conf_graybill,
+                      inv_t = inv_t,
+                      inv_ks = inv_ks,
+                      inv_graybill = inv_graybill))
+}
+```
