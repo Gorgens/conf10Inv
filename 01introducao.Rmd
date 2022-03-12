@@ -10,6 +10,10 @@ O inventário deve atender a certos requisitos técnicos. No estado de Minas Ger
 
 Até recente, no Estado de Minas Gerais, a análise do inventário florestal deve ser precedida de vistoria técnica, durante a qual conferia-se no mínimo 10% das parcelas e no mínimo três parcelas por estrato de amostragem. A vistoria é realizada tendo como acompanhante um representante do empreendimento. 
 
-![Figure 1 - ](imagens/conferencia.png)
+```{r flowchart, fig.align = 'center', out.width = "25%", fig.cap = "Avaliação do inventário florestal protocolado junto ao órgão ambiental. Vistoria-se parte do invnetario para determinar eventuais desvios."}
+knitr::include_graphics(here::here("imagens", "conferencia.png"))
+```
+
+
 
 O objetivo deste trabalho foi avaliar a sensibilidade de duas possíveis abordagens para se analisar inventarios protocolados durante processo de fiscalização. Deseja-se determinar qual o desvio que deve ser detectado durante uma vistoria de campo para fazer com que duas possíveis análises indiquem a rejeição do inventário protocolado junto ao órgão ambiental.

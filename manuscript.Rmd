@@ -18,6 +18,9 @@ authors:
 - name: José Jhones Matuda
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
   email: conferir@ufvjm.edu.br
+- name: Vitor Simplício
+  address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
+  email: eric.gorgens@ufvjm.edu.br
 - name: Tiago Dornelas Otini
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
   email: conferir@ufvjm.edu.br
@@ -30,7 +33,7 @@ authors:
 - name: Eric Bastos Gorgens
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
   email: eric.gorgens@ufvjm.edu.br
-csl: nature.csl
+csl: abnt.csl
 ---
 
 ```{r setup, include=FALSE}
@@ -76,4 +79,4 @@ The purpose of this study is to analyze the sensitivity of different statistical
 ```{r get-mm, child="05conclusao.Rmd"}
 ```
 
-# References
+# Referências

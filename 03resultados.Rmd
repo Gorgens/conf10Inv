@@ -3,13 +3,13 @@ title: "03resultados.Rmd"
 ---
 
 
-```{r packages3, echo=FALSE, message=FALSE}
+```{r packages3}
 require(ggplot2)
 require(dplyr)
 ```
 
 
-```{r merge, echo=FALSE, message=FALSE}
+```{r merge}
 simuladoLinear$inv = "Linear"
 simuladoNativa$inv = "Nativa"
 simuladoPlantada$inv = "Plantada"
@@ -19,7 +19,7 @@ resSimulado = rbind(simuladoLinear, simuladoNativa, simuladoPlantada)
 
 A sensibilidade do Teste t para comparar os diâmetros das árvores do inventário protocolado (protocolado) com as mesmas árvores da conferência em campo (conferido) apresentou alta sensibilidade, acusando significância estatística para diferenças médias no diâmetro a partir de 0,10 cm e desvio padrão de 0,1. Com o aumento do desvio padrão das diferenças, houve uma leve redução na sensibilidade do teste, passando a acusar diferença estatística para desvios médios de 0,25 cm quando o desvio padrão acima de 0,85 cm (Figura 2). Seguindo as regras atualmente vigentes para a conferência de inventário em campo, as quatro intensidades amostrais simuladas resultaram na conferência de 3 parcelas de campo. Assim, o impacto de diferentes médias e desvios padrões foi semelhante nas simulações realizadas.
 
-```{r plotTestet, echo = FALSE}
+```{r plotTestet}
 breaks = c(0, 0.05, 0.1, 1)
 ggplot(resSimulado, aes(difMedia, difSd, z = conf_t)) + 
   geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
@@ -31,7 +31,7 @@ Figure 2. Traduzir
 
 O teste KS comparou a distribuição dos diâmetros das árvores entre o inventário protocolado e o conferido (Figura 3). O Teste KS apresentou menor sensibilidade tanto para as diferenças médias quanto para o desvio padrão das diferenças, em comparação ao Teste t. Apenas desvios médios superiores a 0.55 cm no diâmetro apresentaram significância estatística, com leve acréscimo à medida que o desvio padrão aumentou. A zona de significância fraca (5% a 10% do nível de significância) foi mais proeminente no teste KS. Assim como no teste t, as quatro intensidades amostrais resultaram na conferência de 3 parcelas de campo. Desta forma, a sensibilidade do teste t foi semelhante.
  
-```{r plotKs, echo = FALSE}
+```{r plotKs}
 breaks = c(0, 0.05, 0.1, 1)
 ggplot(resSimulado, aes(difMedia, difSd, z = conf_ks)) + 
   geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
@@ -43,7 +43,7 @@ Figure 3. Traduzir
 
 A relação entre diferenças médias, desvio padrão dos desvios e intensidade amostral apresentou forte impacto no erro amostral (Figura 8). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior quanto menor a intensidade amostral. Na intensidade de 15 parcelas, por exemplo, desvio médio de 0,5 cm já resultou num erro amostral acima do permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
 
-```{r erroInvConf, echo = FALSE}
+```{r erroInvConf}
 ggplot(resSimulado, aes(difMedia, difSd, z = diffErro)) + 
   geom_contour_filled() + ylab('Desvio padrão da diferença (cm)') +
   xlab('Diferença média do DAP (cm)') + facet_wrap(~ inv)

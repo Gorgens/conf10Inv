@@ -2,7 +2,7 @@
 title: "02material.Rmd"
 ---
 
-```{r packages, echo=FALSE, message=FALSE}
+```{r packages2}
 require(ggplot2)
 require(dplyr)
 require(forestmangr)
@@ -10,12 +10,10 @@ require(forestmangr)
 
 Três diferentes tipos de inventários amostrais foram incluídas nesta análise: (1) inventário amostral em floresta nativa, (2) inventário amostral em empreendimentos lineares, e (3) inventário amostral em florestas plantadas. Entende-se que estes quatro inventários representam coletas realizadas pelo empreendedor e protocolados junto ao órgão ambiental como parte de um pedido de intervenção ambiental. 
 
-```{r inventarios, echo=FALSE, message=FALSE}
+```{r inventarios}
 linear = readxl::read_xlsx('dados_v2/linear.xlsx')
 nativa = readxl::read_xlsx('dados_v2/nativa.xlsx')
 plantada = readxl::read_xlsx('dados_v2/plantada.xlsx')
-plantada$d = as.numeric(plantada$c) / pi
-plantada$v = VTCC(plantada$d)
 ```
 
 Duas abordagens possíveis de serem adotadas para a conferência conferência foram incluídas neste estudo. A primeira abordagem compara os valores de diâmetro de 10% das parcelas conferidas com os valores medidos e protocolados pelo empreendimento. Dois testes estatisticos foram analisados: o teste de médias t para amostras pareadas, e o teste de aderência Kolmogorov-Smirnov (KS) para duas distribuições. 
@@ -33,7 +31,7 @@ Na segunda abordagem, foi analisado o impacto do erro detectado na conferência 
  
 $$VTCC = 	-0,0393500 + 0,0118579*DAP - 0,000819184 * DAP^2 + 0,0000413787 * DAP^3$$
 
-```{r eqVol, echo=FALSE}
+```{r eqVol}
 VTCC = function(dap){                                                           # modelo para estimar o volume
   return(-0.0393500+
            0.0118579*dap-
@@ -42,7 +40,7 @@ VTCC = function(dap){                                                           
 }
 ```
 
-```{r funcConferencia, echo=FALSE}
+```{r funcConferencia}
 confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, mediaDesvio = 0.1, desvPadDesvio=0.1){
     # sorteia parcelas que serão conferidas pelo órgão
     parcSorteadas = sample(unique(inventario$parcela), ifelse(ceiling(probConf*nparcelas) < 3, 3, ceiling(probConf*nparcelas)))
@@ -97,7 +95,7 @@ confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, medi
 
 Para avaliar a sensibilidade das duas abordagens de análise dos inventários florestais pelos órgão de fiscalização, foram gerados erros aleatórios que incidiram nos diâmetros presentes no inventário protocolado. Os erros foram gerados por meio de gerador de números aleatórios, seguindo uma distribuição normal com diferentes combinações médias e desvios-padrão. O parâmetro média da disitrubiçãod os erros variou de 0 a 1 cm, em intervalos de 0,1; e o desvio-padrão variou de 0,1 a 1 cm, em intervalos de 0,1. A incorporação aleatória dos erros foi repetida 100 vezes, para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi calculado e a conferência realizada.
 
-```{r dfSimulado, echo=FALSE}
+```{r dfSimulado}
 simulacoes = seq(1, 10, 1)
 
 # Define possíveis médias para o erro em relação ao diâmetro
@@ -119,7 +117,7 @@ simulado = data.frame(simulado,
 
 Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de um erro aleatorio no inventário. Para facilitar a visualização da análise de sensibilidade, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância (presença significativa de erros de medição); valores entre 0,05 e 0,10 indicando uma fraca significância (indícios de erros de medição); e valores acima de 0,10 indicando a não significância (presença não significativa de erros de medição). Os testes estatísticos, bem como o erro amostral foram computados considerando um nível de significância de 10%.
 
-```{r simulacaoNativa, echo=FALSE, eval=FALSE, message=FALSE, warning = FALSE}
+```{r simulacaoNativa, warning = FALSE, cache = TRUE}
 
 for(i in 1:dim(simulado)[1]){
   simulado[i,4:13] = confereInv(inventario = nativa, areaplot = 400, 
@@ -138,7 +136,7 @@ simuladoNativa = simulado %>%
 
 ```
 
-```{r simulacaoLinear, echo=FALSE, eval=FALSE, message=FALSE, warning = FALSE}
+```{r simulacaoLinear, warning = FALSE, cache = TRUE}
 
 for(i in 1:dim(simulado)[1]){
   simulado[i,4:13] = confereInv(inventario = linear, areaplot = 400, 
@@ -157,7 +155,10 @@ simuladoLinear = simulado %>%
 
 ```
 
-```{r simulacaoPlantada, echo=FALSE, eval=FALSE, message=FALSE, warning = FALSE}
+```{r simulacaoPlantada, warning = FALSE, cache = TRUE}
+plantada$d = as.numeric(plantada$c) / pi
+plantada$v = VTCC(plantada$d)
+
 for(i in 1:dim(simulado)[1]){
   simulado[i,4:13] = confereInv(inventario = plantada, areaplot = 400, 
                         probConf = 0.1, nparcelas = 4, 
