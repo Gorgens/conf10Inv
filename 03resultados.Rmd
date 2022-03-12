@@ -9,7 +9,7 @@ require(dplyr)
 ```
 
 
-```{r merge, eval=FALSE, echo=FALSE, message=FALSE}
+```{r merge, echo=FALSE, message=FALSE}
 simuladoLinear$inv = "Linear"
 simuladoNativa$inv = "Nativa"
 simuladoPlantada$inv = "Plantada"
