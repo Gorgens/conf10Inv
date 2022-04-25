@@ -11,25 +11,25 @@ output:
   bookdown::pdf_book:
     base_format: rticles::springer_article
     extra_dependencies: booktabs
-abstract: "[pt] O objetivo deste estudo é analisar a sensibilidade de diferentes abordagens estatísticas para analisar o inventário protocolado a partir do percentual vistoriado. Foi utilizado uma base de dados simulada para representar um inventário florestal com quatro intensidade amostrais: 15, 20, 25 e 30 parcelas. Para a conferência foram escolhidas aleatoriamente 10% das parcelas, garantindo um mínimo de 3 parcelas selecionadas. Foi utilizado o teste t pareado para a comparação entre médias ao nível de árvore. Para a comparação de médias do volume em nível de parcela utilizou-se o teste F de Graybill. O teste de aderência foi realizado pelo teste Kolmogorov-Smirnov. Para identificar a partir de qual momento os testes passariam a indicar diferenças significativas entre os inventários, foi adicionado um desvio de forma crescente ao conjunto de dados conferidos. A comparação entre os inventários apontou que para o desvio com diferença média no diâmetro de 0,1 cm o teste t já apresenta resultados significativos, enquanto o Kolmogorov-Smirnov apresenta a partir de 0,6 cm para a mesma comparação. Os resultados mostraram que a conferência dos 10% das parcelas do inventário protocolado só altera o erro amostral do inventário apenas em baixas intensidades amostrais. [en] The purpose of this study is to analyze the sensitivity of different statistical approaches to analyze the filed inventory based on the percentage inspected. A simulated database was used to represent a forest inventory with four sampling intensities: 15, 20, 25 and 30 plots. For the conference, 10% of the parcels were randomly chosen, guaranteeing a minimum of 3 selected parcels. The paired t-test was used to compare means at the tree level. For the comparison of volume means at the parcel level, the Graybill F test was used. The adherence test was performed using the Kolmogorov-Smirnov test. To identify from which moment the tests would start to indicate significant differences between the inventories, a deviation was increasingly added to the set of verified data. In the comparison between the inventories, it was pointed out that for the deviation with a mean difference in diameter of 0.1 cm, the t test already presents significant results, while the Kolmogorov-Smirnov presents from 0.6 cm for the same comparison. The results showed that the checking of 10% of the parcels of the protocoled inventory only changes the sampling error of the inventory only at low sampling intensities."
+abstract: "[pt] O objetivo deste estudo é analisar a sensibilidade de diferentes abordagens estatísticas para analisar o inventário protocolado a partir do percentual vistoriado. Foram utilizados três diferentes tipos de inventários amostrais nesta análise: inventário amostral em floresta nativa, inventário amostral em empreendimento linear e inventário amostral em floresta plantada.  Para a conferência foram escolhidas aleatoriamente 10% das parcelas, garantindo um mínimo de 3 parcelas selecionadas. Foi utilizado o teste t pareado para a comparação entre médias ao nível de árvore. O teste de aderência foi realizado pelo teste Kolmogorov-Smirnov. Para identificar a partir de qual momento os testes passariam a indicar diferenças significativas entre os inventários, foi adicionado um desvio de forma crescente ao conjunto de dados conferidos. A comparação entre os inventários apontou que para o desvio com diferença média no diâmetro de 0,1 cm o teste t já apresenta resultados significativos, enquanto o Kolmogorov-Smirnov apresenta a partir de 0,6 cm para a mesma comparação.Os resultados mostraram que o tipo de inventário amostral influência no impacto do erro detectado na conferência sobre o erro amostral do inventário protocolado. No entanto, não sendo suficiente para indicar a rejeição do inventário protocolado junto ao órgão ambiental.[en] The purpose of this study is to analyze the sensitivity of different statistical approaches to analyze the filed inventory based on the percentage inspected. A simulated database was used to represent a forest inventory with four sampling intensities: 15, 20, 25 and 30 plots. For the conference, 10% of the parcels were randomly chosen, guaranteeing a minimum of 3 selected parcels. The paired t-test was used to compare means at the tree level. For the comparison of volume means at the parcel level, the Graybill F test was used. The adherence test was performed using the Kolmogorov-Smirnov test. To identify from which moment the tests would start to indicate significant differences between the inventories, a deviation was increasingly added to the set of verified data. In the comparison between the inventories, it was pointed out that for the deviation with a mean difference in diameter of 0.1 cm, the t test already presents significant results, while the Kolmogorov-Smirnov presents from 0.6 cm for the same comparison. The results showed that the checking of 10% of the parcels of the protocoled inventory only changes the sampling error of the inventory only at low sampling intensities."
 bibliography: bibliografia.bib
 biblio-style: spbasic
 authors:
 - name: José Jhones Matuda
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
-  email: conferir@ufvjm.edu.br
-- name: Vitor Simplício
+  email: jhones.matuda@ufvjm.edu.br
+- name: Vitor Hugo dos Santos Simplício
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
-  email: eric.gorgens@ufvjm.edu.br
+  email: vitor.simplicio@ufvjm.edu.br
 - name: Tiago Dornelas Otini
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
-  email: conferir@ufvjm.edu.br
+  email: conferir@ufvjm.edu.br##############
 - name: Marcio Romarco Leles de Oliveira
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
-  email: conferir@ufvjm.edu.br
+  email: marcioromarco@ufvjm.edu.br
 - name: Gilciano Saraiva Nogueira
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
-  email: conferir@ufvjm.edu.br
+  email: gilciano.nogueira@ufvjm.edu.br
 - name: Eric Bastos Gorgens
   address: Universidade Federal dos Vales do Jequitinhonha e Mucuri, Campus JK, Diamantina, MG, Brasil. CEP 39100-000
   email: eric.gorgens@ufvjm.edu.br

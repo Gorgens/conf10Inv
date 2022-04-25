@@ -2,4 +2,15 @@
 title: "05conclusao.Rmd"
 ---
 
-Conforme a legislação citada, o procedimento tem por objetivo a conferência da análise estatística das estimativas volumétricas. Apesar de estabelecer a quantidade mínima de parcelas que deverão ser avaliadas em campo, a resolução não define como a conferência deverá ser operacionalizada. Questões que vão desde a definição de equipamentos e metodologia de coleta, até a escolha do teste estatístico que será usado para realizar a comparação e avaliação das estimativas amostrais não são informadas, nem mesmo em regramentos específicos. Outro elemento importante que fica sem respostas são critérios para se rejeitar ou aprovar determinado inventário, com base nas conferências de campo.
+Os testes estatísticos mostraram-se bastante sensíveis aos desvios de medição observados durante a análise dos inventários. Não sendo constato impactos significativos do erro detectado na conferência sobre o erro amostral dos inventários protocolados. A comparação entre os inventários apontou que para o desvio com diferença média no diâmetro de 0,1 cm o teste t já apresenta resultados significativos, enquanto o Kolmogorov-Smirnov apresenta a partir de 0,5 cm para a mesma comparação.
+
+
+
+
+
+
+
+
+
+
+

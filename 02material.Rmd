@@ -8,26 +8,28 @@ require(dplyr)
 require(forestmangr)
 ```
 
-Três diferentes tipos de inventários amostrais foram incluídas nesta análise: (1) inventário amostral em floresta nativa, (2) inventário amostral em empreendimentos lineares, e (3) inventário amostral em florestas plantadas. Entende-se que estes quatro inventários representam coletas realizadas pelo empreendedor e protocolados junto ao órgão ambiental como parte de um pedido de intervenção ambiental. 
+Três diferentes tipos de inventários amostrais foram incluídos nesta análise: (1) inventário amostral em floresta nativa, (2) inventário amostral em empreendimento linear e (3) inventário amostral em floresta plantada. Entende-se que esses três inventários representam coletas realizadas pelo empreendedor e protocolados junto ao órgão ambiental como parte de um pedido de intervenção ambiental. 
 
 ```{r inventarios}
 linear = readxl::read_xlsx('dados_v2/linear.xlsx')
 nativa = readxl::read_xlsx('dados_v2/nativa.xlsx')
 plantada = readxl::read_xlsx('dados_v2/plantada.xlsx')
+
 ```
 
-Duas abordagens possíveis de serem adotadas para a conferência conferência foram incluídas neste estudo. A primeira abordagem compara os valores de diâmetro de 10% das parcelas conferidas com os valores medidos e protocolados pelo empreendimento. Dois testes estatisticos foram analisados: o teste de médias t para amostras pareadas, e o teste de aderência Kolmogorov-Smirnov (KS) para duas distribuições. 
+Duas abordagens possíveis de serem adotadas para a conferência foram incluídas neste estudo. A primeira abordagem compara os valores de diâmetro de 10% das parcelas conferidas com os valores medidos e protocolados pelo empreendimento. Dois testes estatísticos foram analisados: o teste de médias t para amostras pareadas, e o teste de aderência Kolmogorov-Smirnov (KS) para duas distribuições. 
 
-O teste t é defindo pela fórmula:
+O teste t é definido pela fórmula:
 
 $$t = \frac{m}{\frac{s}{\sqrt(n)}}$$
-em que $m$ é a média das diferenças, $n$ é o tamanho a amostra e $s$ é o desvio padrão das diferenças.
+Em que $m$ é a média das diferenças, $n$ é o tamanho da amostra e $s$ é o desvio padrão das diferenças.
 
-O teste de KS é uma comparação de funções de distribuição acumuladas, testando para a máxima diferença observada:
+O teste de KS é uma comparação de funções de distribuição acumulada, testando para a máxima diferença observada:
 
 $$D^+ = max[F_x(u) - F_y(u)]$$
+Em que $F_x(u)$ e $F_y(u)$ é a distribuição da probabilidade teórica e empírica, respectivamente.   
 
-Na segunda abordagem, foi analisado o impacto do erro detectado na conferência sobre o erro amostral do inventario protocolado. Para a calculo do erro, foi adotado que todos os inventarios (com excessao do inventário censo), seguiram delineamento casual simples e o volume total com casca das árvores individuais foram estimadas pela equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
+Na segunda abordagem, foi analisado o impacto do erro detectado na conferência sobre o erro amostral do inventário protocolado. Para o cálculo do erro, foi adotado que todos os inventários, seguiram delineamento casual simples e o volume total com casca das árvores individuais foram estimadas pela equação do CETEC (1995) para cerrado (Equação 1 - $R^2=96,4%$). 
  
 $$VTCC = 	-0,0393500 + 0,0118579*DAP - 0,000819184 * DAP^2 + 0,0000413787 * DAP^3$$
 
@@ -93,15 +95,15 @@ confereInv = function(inventario, areaplot=400, probConf=0.1, nparcelas=10, medi
 }
 ```
 
-Para avaliar a sensibilidade das duas abordagens de análise dos inventários florestais pelos órgão de fiscalização, foram gerados erros aleatórios que incidiram nos diâmetros presentes no inventário protocolado. Os erros foram gerados por meio de gerador de números aleatórios, seguindo uma distribuição normal com diferentes combinações médias e desvios-padrão. O parâmetro média da disitrubiçãod os erros variou de 0 a 1 cm, em intervalos de 0,1; e o desvio-padrão variou de 0,1 a 1 cm, em intervalos de 0,1. A incorporação aleatória dos erros foi repetida 100 vezes, para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi calculado e a conferência realizada.
+Para avaliar a sensibilidade das duas abordagens de análise dos inventários florestais pelo órgão de fiscalização, foram gerados erros aleatórios que incidiram nos diâmetros presentes no inventário protocolado. Os erros foram gerados por meio de gerador de números aleatórios, seguindo uma distribuição normal com diferentes combinações médias e desvios-padrão. O parâmetro média da distribuição dos erros variou de 0 a 1.5 cm, em intervalos de 0,1; e o desvio-padrão variou de 0,1 a 1.5 cm, em intervalos de 0,1. A incorporação aleatória dos erros foi repetida 100 vezes, para cada combinação de média e desvio padrão. Após a adição dos desvios ao DAP, o volume de cada árvore foi calculado e a conferência realizada.
 
 ```{r dfSimulado}
 simulacoes = seq(1, 10, 1)
 
 # Define possíveis médias para o erro em relação ao diâmetro
-variacaoErroMedio = seq(0, 1, 0.2)
+variacaoErroMedio = seq(0, 1.5, 0.2)
 # Define possíveis desvios-padrão para o erro em relação ao diâmetro
-variacaoDesvMedio = seq(0.1, 1, 0.2)
+variacaoDesvMedio = seq(0.1, 1.5, 0.2)
 
 simulado = expand.grid(difMedia = variacaoErroMedio,
                        difSd = variacaoDesvMedio,
@@ -115,7 +117,7 @@ simulado = data.frame(simulado,
                       conf_ks = 0)
 ```
 
-Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de um erro aleatorio no inventário. Para facilitar a visualização da análise de sensibilidade, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância (presença significativa de erros de medição); valores entre 0,05 e 0,10 indicando uma fraca significância (indícios de erros de medição); e valores acima de 0,10 indicando a não significância (presença não significativa de erros de medição). Os testes estatísticos, bem como o erro amostral foram computados considerando um nível de significância de 10%.
+Com base nos valores de significância dos testes, a superfície de solução foi construída para analisar a sensibilidade do teste para a presença de um erro aleatório no inventário. Para facilitar a visualização da análise de sensibilidade, os níveis de significância foram representados por três classes: valores entre 0,00 a 0,05 indicando forte significância (presença significativa de erros de medição); valores entre 0,05 e 0,10 indicando uma fraca significância (indícios de erros de medição); e valores acima de 0,10 indicando a não significância (presença não significativa de erros de medição). Os testes estatísticos, bem como o erro amostral foram computados considerando um nível de significância de 10%.
 
 ```{r simulacaoNativa, warning = FALSE, cache = TRUE}
 

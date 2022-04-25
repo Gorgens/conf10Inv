@@ -1,53 +1,61 @@
 ---
 title: "03resultados.Rmd"
+editor_options: 
+  chunk_output_type: console
 ---
-
 
 ```{r packages3}
 require(ggplot2)
 require(dplyr)
+require(here)
 ```
 
 
 ```{r merge}
-simuladoLinear$inv = "Linear"
-simuladoNativa$inv = "Nativa"
-simuladoPlantada$inv = "Plantada"
-resSimulado = rbind(simuladoLinear, simuladoNativa, simuladoPlantada)
+simuladoLinear$inv =   "Linear"
+simuladoNativa$inv =   "Nativa"
+simuladoPlantada$inv =   "Plantada"
+resSimulado =   rbind(simuladoLinear, simuladoNativa, simuladoPlantada)
 ```
 
 
-A sensibilidade do Teste t para comparar os diâmetros das árvores do inventário protocolado (protocolado) com as mesmas árvores da conferência em campo (conferido) apresentou alta sensibilidade, acusando significância estatística para diferenças médias no diâmetro a partir de 0,10 cm e desvio padrão de 0,1. Com o aumento do desvio padrão das diferenças, houve uma leve redução na sensibilidade do teste, passando a acusar diferença estatística para desvios médios de 0,25 cm quando o desvio padrão acima de 0,85 cm (Figura 2). Seguindo as regras atualmente vigentes para a conferência de inventário em campo, as quatro intensidades amostrais simuladas resultaram na conferência de 3 parcelas de campo. Assim, o impacto de diferentes médias e desvios padrões foi semelhante nas simulações realizadas.
+A sensibilidade do Teste t para comparar os diâmetros das árvores do inventário do empreendimento (protocolado) com as mesmas árvores da conferência em campo (conferido) apresentou alta sensibilidade, acusando significância estatística para diferenças médias no diâmetro a partir de 0,10 cm e desvio padrão de 0,1 cm. Com o aumento do desvio padrão das diferenças, houve uma leve redução na sensibilidade do teste, passando a acusar diferença estatística para desvios médios de 0,25 cm quando o desvio padrão acima de 0,85 cm (Figura 2).
 
 ```{r plotTestet}
 breaks = c(0, 0.05, 0.1, 1)
 ggplot(resSimulado, aes(difMedia, difSd, z = conf_t)) + 
+ scale_x_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
+ scale_y_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
   geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
   xlab('Diferença média do DAP (cm)') + facet_wrap(~ inv)
 ```
 
 Figura 2. Significância do teste t para diferentes distribuições do erro de medição do diâmetro.
-Figure 2. Traduzir
+Figure 2. Significance of the t-test for different distributions of diameter measurement error.
 
-O teste KS comparou a distribuição dos diâmetros das árvores entre o inventário protocolado e o conferido (Figura 3). O Teste KS apresentou menor sensibilidade tanto para as diferenças médias quanto para o desvio padrão das diferenças, em comparação ao Teste t. Apenas desvios médios superiores a 0.55 cm no diâmetro apresentaram significância estatística, com leve acréscimo à medida que o desvio padrão aumentou. A zona de significância fraca (5% a 10% do nível de significância) foi mais proeminente no teste KS. Assim como no teste t, as quatro intensidades amostrais resultaram na conferência de 3 parcelas de campo. Desta forma, a sensibilidade do teste t foi semelhante.
+O teste KS comparou a distribuição dos diâmetros das árvores entre o inventário protocolado e o conferido (Figura 3). O Teste KS apresentou menor sensibilidade tanto para as diferenças médias quanto para o desvio padrão das diferenças, em comparação ao Teste t. Apenas desvios médios superiores a 0.50 cm no diâmetro apresentaram significância estatística, com leve acréscimo à medida que o desvio padrão aumentou. A zona de significância fraca (5% a 10% do nível de significância) foi mais proeminente no teste KS. 
  
 ```{r plotKs}
 breaks = c(0, 0.05, 0.1, 1)
-ggplot(resSimulado, aes(difMedia, difSd, z = conf_ks)) + 
+ggplot(resSimulado, aes(difMedia, difSd, z = conf_ks)) +
+ scale_x_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
+ scale_y_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
   geom_contour_filled(breaks = breaks) + ylab('Desvio padrão da diferença (cm)') +
   xlab('Diferença média do DAP (cm)') + facet_wrap(~ inv)
 ```
 
 Figura 3. Significância do teste Kolmogorov-Smirnov para diferentes distribuições do erro de medição do diâmetro.
-Figure 3. Traduzir
+Figure 3. Significance of the Kolmogorov-Smirnov test for different distributions of diameter measurement error.
 
-A relação entre diferenças médias, desvio padrão dos desvios e intensidade amostral apresentou forte impacto no erro amostral (Figura 8). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior quanto menor a intensidade amostral. Na intensidade de 15 parcelas, por exemplo, desvio médio de 0,5 cm já resultou num erro amostral acima do permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
+A relação entre as diferenças médias e o desvio padrão das diferenças, apresentaram impactos variados no erro amostral de acordo com o tipo de inventário (Figura 4). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior para o inventário em empreendimento linear. No entanto, mesmo com desvio médio de 1.5 cm no diâmetro o erro amostral não ultrapassou 4.5%, mantendo-se abaixo do erro máximo permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
 
 ```{r erroInvConf}
 ggplot(resSimulado, aes(difMedia, difSd, z = diffErro)) + 
+   scale_x_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
+ scale_y_continuous(limits = c(0,1.5), breaks = seq(0,1.5,0.25))+
   geom_contour_filled() + ylab('Desvio padrão da diferença (cm)') +
   xlab('Diferença média do DAP (cm)') + facet_wrap(~ inv)
 ```
 
-Figura 8. Alteração no erro relativo do inventário para diferentes distribuições do erro de medição do diâmetro.
-Figure 8. Traduzir
+Figura 4. Alteração no erro relativo do inventário para diferentes distribuições do erro de medição do diâmetro.
+Figure 4. Change in relative inventory error for different diameter measurement error distributions.
