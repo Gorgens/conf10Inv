@@ -47,7 +47,7 @@ ggplot(resSimulado, aes(difMedia, difSd, z = conf_ks)) +
 Figura 3. Significância do teste Kolmogorov-Smirnov para diferentes distribuições do erro de medição do diâmetro.
 Figure 3. Significance of the Kolmogorov-Smirnov test for different distributions of diameter measurement error.
 
-A relação entre as diferenças médias e o desvio padrão das diferenças, apresentaram impactos variados no erro amostral de acordo com o tipo de inventário (Figura 4). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior para o inventário em empreendimento linear. No entanto, mesmo com desvio médio de 1.5 cm no diâmetro o erro amostral não ultrapassou 4.5%, mantendo-se abaixo do erro máximo permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
+A relação entre as diferenças médias e o desvio padrão das diferenças, apresentaram impactos variados no erro amostral de acordo com o tipo de inventário (Figura 4). Considerando a substituição dos dados conferidos na base protocolada (misto), o impacto no erro amostral é maior para o inventário em empreendimento linear. No entanto, mesmo com desvio médio de 1.5 cm no diâmetro o erro amostral não ultrapassou 5%, mantendo-se abaixo do erro máximo permitido em lei (10%). O desvio padrão das diferenças tem pouca influência no erro amostral. 
 
 ```{r erroInvConf}
 ggplot(resSimulado, aes(difMedia, difSd, z = diffErro)) + 
